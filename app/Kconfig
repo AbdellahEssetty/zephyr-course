@@ -1,0 +1,40 @@
+menu "LED Subsystem"
+  config LED_SLEEP_TIME_MS
+      int "LED sleep time (ms)"
+      default 1000
+      range 100 10000
+      help
+        Set the sleep time for the LED in milliseconds. This value determines how long the LED will remain on before turning off. Adjust this setting based on your application's requirements for visual feedback.
+  
+  menuconfig LED_ADVANCED
+    bool "Advanced LED Options"
+    default n
+
+
+  if LED_ADVANCED
+
+    config LED_BRIGHTNESS
+        int "LED brightness (0-100)"
+        default 100
+        range 0 100
+
+    config LED_FADE_DURATION_MS
+        int "LED fade duration (ms)"
+        default 500
+        range 0 10000
+
+    menu "Expert settings"
+
+      config LED_DEBUG
+          bool "Enable LED debugging"
+          default n
+
+      config LED_CUSTOM_PATTERN
+          bool "Custom blink pattern"
+          default n
+    
+    endmenu
+  endif
+    
+endmenu
+source "Kconfig.zephyr"
