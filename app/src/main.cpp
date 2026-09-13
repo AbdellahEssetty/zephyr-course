@@ -11,7 +11,13 @@
 #define CONFIG_LED_BRIGHTNESS 50
 #endif
 
-/* The devicetree node identifier for the "led0" alias. */
+#ifndef CONFIG_APP_HEARTBEAT_PERIOD_MS
+#define CONFIG_APP_HEARTBEAT_PERIOD_MS 500
+#endif
+
+#define APP_LED DT_ALIAS(app_led)
+static const struct gpio_dt_spec app_led = GPIO_DT_SPEC_GET(APP_LED, gpios);
+
 #define LED_NODE DT_ALIAS(led0)
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
 
@@ -25,19 +31,16 @@ int main(void)
 {
     bool led_state = true;
 
-    if (!gpio_is_ready_dt(&led)) return 0;
+    if (!gpio_is_ready_dt(&app_led)) return 0;
 
-    if (gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE) < 0) return 0;
-    // led_set_brightness_dt(&led_pwm, CONFIG_LED_BRIGHTNESS);
-
-
+    if (gpio_pin_configure_dt(&app_led, GPIO_OUTPUT_ACTIVE) < 0) return 0;
 
     while (1) {
-        if (gpio_pin_toggle_dt(&led) < 0) return 0;
+        if (gpio_pin_toggle_dt(&app_led) < 0) return 0;
 
         led_state = !led_state;
         LOG_INF("LED state: %s", led_state ? "ON" : "OFF");
-        k_msleep(CONFIG_LED_SLEEP_TIME_MS);
+        k_msleep(CONFIG_APP_HEARTBEAT_PERIOD_MS);
     }
     return 0;
 }

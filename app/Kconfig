@@ -1,4 +1,10 @@
 menu "LED Subsystem"
+  config APP_HEARTBEAT_PERIOD_MS
+      int "Heartbeat period (ms)"
+      default 500
+      range 100 1000
+      help
+        Set the heartbeat period for the LED in milliseconds. This value determines how frequently the LED will blink to indicate that the application is running. Adjust this setting based on your application's requirements for visual feedback.
   config LED_SLEEP_TIME_MS
       int "LED sleep time (ms)"
       default 1000
