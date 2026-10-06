@@ -1,0 +1,23 @@
+/dts-v1/;
+
+#include <nordic/nrf9160_sica.dtsi>
+#include "board_scratch_nrf9160_common.dtsi"
+
+/ {
+    model = "Custom nRF9160 Board";
+    compatible = "custom,board-scratch";
+
+    chosen {
+        zephyr,flash = &flash0;
+        zephyr,sram = &sram0;
+        zephyr,console = &uart0;
+        zephyr,shell-uart = &uart0;
+        zephyr,uart-mcumgr = &uart0;
+    };
+
+};
+
+&uart0 {
+    status = "okay";
+    current-speed = <115200>;
+};
