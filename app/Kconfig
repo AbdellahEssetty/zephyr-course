@@ -44,3 +44,4 @@ menu "LED Subsystem"
     
 endmenu
 source "Kconfig.zephyr"
+rsource "drivers/sensor/Kconfig"

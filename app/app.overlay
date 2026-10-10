@@ -1,5 +1,10 @@
-// /{
-// 	aliases {
-// 		app-led = &led1;
-// 	};
-// };
+/ {
+    aliases {
+        app-led = &led1;
+    };
+
+    led_sensor: led-sensor {
+        compatible = "demo,led-sensor";
+        status = "okay";
+    };
+};

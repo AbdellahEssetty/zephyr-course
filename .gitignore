@@ -4,3 +4,10 @@ build
 # West files
 .west
 deps
+
+# Vim Backup files
+*.swp
+*~
+
+# Previous Board files
+boards

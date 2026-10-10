@@ -1,2 +1,0 @@
-config BOARD_BOARD_SCRATCH
-	select SOC_NRF9160_SICA
