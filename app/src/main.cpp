@@ -6,6 +6,8 @@
 
 #include <zephyr/sys/printk.h>
 
+#include "led_sensor.h"
+
 
 #ifndef CONFIG_LED_SLEEP_TIME_MS
 #define CONFIG_LED_SLEEP_TIME_MS 1000
@@ -33,6 +35,8 @@
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
+
+
 int main(void)
 {
     // bool led_state = true;
@@ -58,6 +62,13 @@ int main(void)
     if (!device_is_ready(led_sensor_dev))
     {
         LOG_ERR("LED sensor device not ready");
+        return 0;
+    }
+
+    ret = led_sensor_set_sample_count(led_sensor_dev, 10U);
+
+    if (ret < 0) {
+        LOG_ERR("Failed to update sample count: %d", ret);
         return 0;
     }
 

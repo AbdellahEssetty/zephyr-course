@@ -7,6 +7,8 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 
+#include "led_sensor.h"
+
 LOG_MODULE_REGISTER(led_sensor, CONFIG_SENSOR_LOG_LEVEL);
 
 struct led_sensor_config
@@ -56,6 +58,25 @@ static int led_sensor_channel_get(const struct device *dev,
     LOG_INF("LED turned OFF");
     return 0;
 }
+struct led_sensor_data
+{
+    uint32_t sample_count;
+};
+
+int led_sensor_set_sample_count(const struct device *dev, uint32_t count)
+{
+    struct led_sensor_data *data = dev->data;
+
+    if (data == NULL) {
+        return -EINVAL;
+    }
+
+    data->sample_count = count;
+
+    LOG_INF("sample_count updated to %u", count);
+
+    return 0;
+}
 
 static int led_sensor_init(const struct device *dev)
 {
@@ -87,10 +108,11 @@ static const struct sensor_driver_api led_sensor_api = {
     static const struct led_sensor_config led_sensor_config_##inst = { \
         .led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios),                \
     };                                                                 \
+    static struct led_sensor_data led_sensor_data_##inst;              \
     DEVICE_DT_INST_DEFINE(inst,                                        \
                           led_sensor_init,                             \
                           NULL,                                        \
-                          NULL,                                        \
+                          &led_sensor_data_##inst,                     \
                           &led_sensor_config_##inst,                   \
                           POST_KERNEL,                                 \
                           CONFIG_SENSOR_INIT_PRIORITY,                 \

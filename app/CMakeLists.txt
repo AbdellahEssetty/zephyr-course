@@ -8,5 +8,7 @@ list(APPEND BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR})
 find_package(Zephyr REQUIRED)
 project(my_zephyr_app)
 
+target_include_directories(app PRIVATE inc/)
+
 # add_subdirectory(drivers/sensor)
 target_sources(app PRIVATE src/main.cpp drivers/sensor/led_sensor.c)

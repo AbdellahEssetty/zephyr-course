@@ -1,6 +1,0 @@
-/ {
-	led-sensor {
-		compatible = "demo,led-sensor";
-		status = "okay";
-	};
-};
