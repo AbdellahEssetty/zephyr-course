@@ -6,6 +6,9 @@
 
 #include <zephyr/sys/printk.h>
 
+#include <zephyr/device.h>
+#include <zephyr/shell/shell.h>
+
 #include "led_sensor.h"
 
 
@@ -36,6 +39,76 @@
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 
+static const struct device *led_sensor_dev = DEVICE_DT_GET(DT_NODELABEL(led_sensor));
+
+static int cmd_sensor_fetch(const struct shell *shell, size_t argc, char **argv)
+{
+    struct sensor_value val;
+    int ret;
+
+    if (!device_is_ready(led_sensor_dev))
+    {
+        shell_error(shell, "LED sensor device not ready");
+        return -ENODEV;
+    }
+
+    ret = sensor_sample_fetch(led_sensor_dev);
+    if (ret < 0)
+    {
+        shell_error(shell, "Failed to fetch sample: %d", ret);
+        return ret;
+    }
+
+    ret = sensor_channel_get(led_sensor_dev, SENSOR_CHAN_ALL, &val);
+    if (ret < 0)
+    {
+        shell_error(shell, "Failed to get channel data: %d", ret);
+        return ret;
+    }
+
+    shell_print(shell, "Sample count: %d", val.val1);
+
+    return 0;
+}
+
+static int cmd_sensor_read(const struct shell *shell, size_t argc, char **argv)
+{
+    struct sensor_value val;
+    int ret;
+
+    if (!device_is_ready(led_sensor_dev))
+    {
+        shell_error(shell, "LED sensor device not ready");
+        return -ENODEV;
+    }
+
+    ret = sensor_channel_get(led_sensor_dev, SENSOR_CHAN_ALL, &val);
+    if (ret < 0)
+    {
+        shell_error(shell, "Failed to get channel data: %d", ret);
+        return ret;
+    }
+
+    shell_print(shell, "Sample count: %d", val.val1);
+
+    return 0;
+}
+
+static int cmd_sensor_info(const struct shell *shell, size_t argc, char **argv)
+{
+    shell_print(shell, "LED Sensor Device: %s", led_sensor_dev->name);
+    shell_print(shell, "Ready: %s", device_is_ready(led_sensor_dev) ? "Yes" : "No");
+    return 0;
+}
+
+SHELL_STATIC_SUBCMD_SET_CREATE(sensor_cmds,
+    SHELL_CMD(fetch, NULL, "Fetch a new sample from the LED sensor", cmd_sensor_fetch),
+    SHELL_CMD(read, NULL, "Read the last fetched sample from the LED sensor", cmd_sensor_read),
+    SHELL_CMD(info, NULL, "Get information about the LED sensor device", cmd_sensor_info),
+    SHELL_SUBCMD_SET_END
+);
+
+SHELL_CMD_REGISTER(sensor, &sensor_cmds, "LED Sensor commands", NULL);
 
 int main(void)
 {
@@ -54,40 +127,40 @@ int main(void)
     // }
     // LOG_INF("Hello, Zephyr!");
 
-    const struct device *led_sensor_dev = DEVICE_DT_GET(DT_NODELABEL(led_sensor));
+    // const struct device *led_sensor_dev = DEVICE_DT_GET(DT_NODELABEL(led_sensor));
 
-    struct sensor_value val;
-    int ret;
+    // struct sensor_value val;
+    // int ret;
 
-    if (!device_is_ready(led_sensor_dev))
-    {
-        LOG_ERR("LED sensor device not ready");
-        return 0;
-    }
+    // if (!device_is_ready(led_sensor_dev))
+    // {
+    //     LOG_ERR("LED sensor device not ready");
+    //     return 0;
+    // }
 
-    ret = led_sensor_set_sample_count(led_sensor_dev, 10U);
+    // ret = led_sensor_set_sample_count(led_sensor_dev, 10U);
 
-    if (ret < 0) {
-        LOG_ERR("Failed to update sample count: %d", ret);
-        return 0;
-    }
+    // if (ret < 0) {
+    //     LOG_ERR("Failed to update sample count: %d", ret);
+    //     return 0;
+    // }
 
-    while(1)
-    {
-        ret = sensor_sample_fetch(led_sensor_dev);
-        if (ret < 0)
-        {
-            LOG_ERR("Failed to fetch sample: %d", ret);
-            return 0;
-        }
+    // while(1)
+    // {
+    //     ret = sensor_sample_fetch(led_sensor_dev);
+    //     if (ret < 0)
+    //     {
+    //         LOG_ERR("Failed to fetch sample: %d", ret);
+    //         return 0;
+    //     }
 
-        ret = sensor_channel_get(led_sensor_dev, SENSOR_CHAN_ALL, &val);
-        if (ret < 0)
-        {
-            LOG_ERR("Failed to get channel data: %d", ret);
-            return 0;
-        }
+    //     ret = sensor_channel_get(led_sensor_dev, SENSOR_CHAN_ALL, &val);
+    //     if (ret < 0)
+    //     {
+    //         LOG_ERR("Failed to get channel data: %d", ret);
+    //         return 0;
+    //     }
 
-        k_msleep(CONFIG_APP_HEARTBEAT_PERIOD_MS);
-    }
+    //     k_msleep(CONFIG_APP_HEARTBEAT_PERIOD_MS);
+    // }
 }

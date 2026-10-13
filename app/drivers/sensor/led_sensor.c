@@ -16,10 +16,16 @@ struct led_sensor_config
     const struct gpio_dt_spec led;
 };
 
+struct led_sensor_data
+{
+    uint32_t sample_count;
+};
+
 static int led_sensor_sample_fetch(const struct device *dev,
                                    enum sensor_channel chan)
 {
     const struct led_sensor_config *config = dev->config;
+    struct led_sensor_data *data = dev->data;
     int ret;
 
     ARG_UNUSED(chan);
@@ -34,6 +40,7 @@ static int led_sensor_sample_fetch(const struct device *dev,
     {
         return ret;
     }
+    data->sample_count++;
 
     LOG_INF("LED turned ON");
     return 0;
@@ -44,10 +51,13 @@ static int led_sensor_channel_get(const struct device *dev,
                                   struct sensor_value *val)
 {
     const struct led_sensor_config *config = dev->config;
+    struct led_sensor_data *data = dev->data;
     int ret;
+    
+    val->val1 = data->sample_count;
+    val->val2 = 0;
 
     ARG_UNUSED(chan);
-    ARG_UNUSED(val);
 
     ret = gpio_pin_set_dt(&config->led, 0);
     if (ret < 0)
@@ -58,10 +68,6 @@ static int led_sensor_channel_get(const struct device *dev,
     LOG_INF("LED turned OFF");
     return 0;
 }
-struct led_sensor_data
-{
-    uint32_t sample_count;
-};
 
 int led_sensor_set_sample_count(const struct device *dev, uint32_t count)
 {
