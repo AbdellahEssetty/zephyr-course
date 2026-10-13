@@ -101,10 +101,32 @@ static int cmd_sensor_info(const struct shell *shell, size_t argc, char **argv)
     return 0;
 }
 
+static int cmd_sensor_set(const struct shell *shell, size_t argc, char **argv)
+{
+    if (argc < 2)
+    {
+        shell_error(shell, "Usage: sensor set <count>");
+        return -EINVAL;
+    }
+
+    uint32_t count = strtoul(argv[1], NULL, 10);
+    int ret = led_sensor_set_sample_count(led_sensor_dev, count);
+    if (ret < 0)
+    {
+        shell_error(shell, "Failed to set sample count: %d", ret);
+        return ret;
+    }
+
+    shell_print(shell, "Sample count set to: %d", count);
+    return 0;
+}
+
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sensor_cmds,
     SHELL_CMD(fetch, NULL, "Fetch a new sample from the LED sensor", cmd_sensor_fetch),
     SHELL_CMD(read, NULL, "Read the last fetched sample from the LED sensor", cmd_sensor_read),
     SHELL_CMD(info, NULL, "Get information about the LED sensor device", cmd_sensor_info),
+    SHELL_CMD(set, NULL, "Set the sample count for the LED sensor", cmd_sensor_set),
     SHELL_SUBCMD_SET_END
 );
 
